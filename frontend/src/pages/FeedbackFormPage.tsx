@@ -12,6 +12,10 @@ import clsx from 'clsx';
 // Shared option lists — imported from single source of truth
 import { NATURES, PRIORITIES } from '../constants/feedbackOptions';
 
+type CategoryAssignee = {
+  assignee: Assignee;
+};
+
 const FEEDBACK_SOURCES = [
   'Compassion Space', 'Email/Teams', 'Employee Engagement / Experience Feedback',
   'Employee Review Platforms ( Ambition Box )', 'Employee Review Platforms ( Glassdoor)', 
@@ -68,7 +72,7 @@ export function FeedbackFormPage() {
 
   /* ─── Query: Fetch category assignees for selected category ─── */
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const { data: categoryAssignees = [] } = useQuery({
+  const { data: categoryAssignees = [] } = useQuery<CategoryAssignee[]>({
     queryKey: ['category-assignees', selectedCategoryId],
     queryFn: () =>
       selectedCategoryId
