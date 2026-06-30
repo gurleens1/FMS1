@@ -7,7 +7,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import clsx from 'clsx';
 // Import your damco logo here
-import damcoLogo from "../../Assets/damco-logo.png.png";
+import damcoLogo from "../Assets/damco-logo.png.png";
 
 interface NavItem {
   to:       string;
