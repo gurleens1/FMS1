@@ -6,8 +6,7 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import clsx from 'clsx';
-// Import your damco logo here
-import damcoLogo from "../images/logo.png";
+
 
 interface NavItem {
   to:       string;
@@ -135,7 +134,7 @@ export function AppShell() {
               <i className="fa-solid fa-bars text-lg" />
             </button>
             {/* Damco Logo Left Aligned and Increased Size */}
-            <img src={damcoLogo} alt="Damco" className="h-12 w-auto object-contain" />
+            <img src="/logo.png" alt="logo" />
           </div>
 
           <div className="flex-1 flex justify-center">
