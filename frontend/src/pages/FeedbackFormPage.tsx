@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { feedbackApi, employeeApi, userApi } from '../services/api';
 import { categoryApi } from '../services/categoryApi';
-import { categoryAssigneeApi } from '../services/categoryAssigneeApi';
 import type { Employee, Assignee } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { CheckCircle, User, Eye, EyeOff, Lock, Unlock, Paperclip, Search } from 'lucide-react';
@@ -12,17 +11,12 @@ import clsx from 'clsx';
 // Shared option lists — imported from single source of truth
 import { NATURES, PRIORITIES } from '../constants/feedbackOptions';
 
-type CategoryAssignee = {
-  assignee: Assignee;
-};
-
 const FEEDBACK_SOURCES = [
   'Compassion Space', 'Email/Teams', 'Employee Engagement / Experience Feedback',
   'Employee Review Platforms ( Ambition Box )', 'Employee Review Platforms ( Glassdoor)', 
   'Employee Review Platforms ( Google Business )', 'Employee Review Platforms ( Others )', 
   'Employee Touchpoints Feedback', 'Exit Interview', 'Helpdesks', 'Managers', 'Others', 'Pulse Check', 'Voice Box'
 ];
-const DIVISIONS = ['Administration', 'Application Development and Management', 'Business Excellence', 'Finance and Accounts', 'Human Resources', 'Insurance', 'IT Support and Staffing', 'ITeS', 'Management', 'Marketing', 'Marketing Services', 'Sales', 'Salesforce', 'Staffing USA', 'Strategy Marketing and Sales Enablement (SMS)', 'Technology Services'];
 
 const SOURCE_TO_ENUM: Record<string, string> = {
   'Pulse Check': 'PulseCheck',
@@ -70,28 +64,11 @@ export function FeedbackFormPage() {
     queryFn: () => categoryApi.list().then((r) => r.data),
   });
 
-  /* ─── Query: Fetch category assignees for selected category ─── */
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const { data } = useQuery({
-    queryKey: ['category-assignees', selectedCategoryId],
-    queryFn: async (): Promise<CategoryAssignee[]> => {
-      if (!selectedCategoryId) return [];
-      const res = await categoryAssigneeApi.listByCategory(selectedCategoryId);
-      return res.data;
-    },
-    enabled: !!selectedCategoryId,
-  });
-
-  const categoryAssignees: CategoryAssignee[] = data ?? [];
-
   /* ─── Query: Fetch all assignees for secondary selection ─── */
   const { data: assignees = [] } = useQuery<Assignee[]>({
     queryKey: ['assignees-list'],
     queryFn: () => userApi.assignees().then((r) => r.data),
   });
-
-  // Extract unique assignee objects from category assignees
-  const categoryPrimaryAssignees = categoryAssignees.map((ca) => ca.assignee);
 
   const [form, setForm] = useState({
     title: '',
@@ -234,8 +211,6 @@ export function FeedbackFormPage() {
     // Find the selected category
     const selectedCat = categories.find((c) => c.name === categoryValue);
     if (selectedCat) {
-      setSelectedCategoryId(selectedCat.id);
-      
       // Auto-select the first primary assignee if any exist
       const primaryAssignees = selectedCat.primaryAssignees || [];
       if (primaryAssignees.length >= 1) {
