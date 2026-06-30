@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import clsx from 'clsx';
 
 // 1. Import the logo from your assets folder here:
-import damcoLogo from "../assets/damco-logo.png.png";
+import damcoLogo from "../assets/damco-logo.png";
 
 export function LoginPage() {
   const navigate = useNavigate();

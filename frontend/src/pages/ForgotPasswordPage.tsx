@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../services/api';
-import damcoLogo from "../assets/damco-logo.png.png";
+import damcoLogo from "../assets/damco-logo.png";
 
 type Step = 'email' | 'otp' | 'reset' | 'done';
 
