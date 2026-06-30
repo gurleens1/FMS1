@@ -53,7 +53,15 @@ export function FeedbackFormPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   /* ─── Query: Fetch all categories with their assignees ─── */
-  const { data: categories = [], isLoading: loadingCategories } = useQuery({
+  interface Category {
+    id: number;
+    name: string;
+    primaryAssignees: {
+      assigneeId: number;
+    }[];
+  }
+
+  const { data: categories = [], isLoading: loadingCategories } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: () => categoryApi.list().then((r) => r.data),
   });
