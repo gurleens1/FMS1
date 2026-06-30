@@ -1,0 +1,138 @@
+/* CHANGED: Damco brand fonts — Meiryo (headings) + Calibri (body) */
+/* FontAwesome for icons (loaded via CDN in index.html) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    /* CHANGED: Background to a clean off-white, text to Damco Black, font to Calibri */
+    @apply bg-[#F8F9FA] text-damco-black font-sans antialiased;
+    min-height: 100vh;
+    min-height: 100dvh; /* dynamic viewport for mobile */
+  }
+
+  /* CHANGED: Damco typography hierarchy */
+  h1, h2, h3 { 
+    @apply font-display text-damco-black; 
+  }
+  h4, h5, h6 { 
+    @apply font-sans font-bold text-damco-black; 
+  }
+}
+
+@layer components {
+  /* ── Card ── */
+  .card {
+    @apply bg-damco-white rounded-xl border border-gray-200 shadow-sm;
+  }
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-md;
+  }
+
+  /* ── Buttons — Damco Red primary ── */
+  .btn-primary {
+    /* CHANGED: Solid Damco Red, Damco White text, and Damco Burgundy for hover (No gradients!) */
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-damco-red text-damco-white
+           text-sm font-bold hover:bg-damco-burgundy active:bg-damco-burgundy
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    /* CHANGED: Secondary buttons stay light but use Damco Black for text */
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-damco-white text-damco-black
+           border border-gray-300 text-sm font-bold hover:bg-gray-50
+           transition-colors duration-150;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-damco-black/70
+           text-sm hover:bg-gray-100 hover:text-damco-black transition-colors duration-150;
+  }
+  .btn-danger {
+    /* CHANGED: Utilizing Damco colors for danger state */
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-damco-red/10 text-damco-red
+           border border-damco-red/20 text-sm font-bold hover:bg-damco-red/20 transition-colors duration-150;
+  }
+
+  /* ── Form inputs ── */
+  .form-input {
+    /* CHANGED: Focus ring uses Damco Red */
+    @apply w-full px-3 py-2 rounded-lg border border-gray-300 bg-damco-white text-damco-black
+           text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-damco-red/20
+           focus:border-damco-red transition-colors duration-150;
+  }
+  .form-label {
+    @apply block text-sm font-bold text-damco-black mb-1;
+  }
+  .form-select {
+    @apply form-input appearance-none cursor-pointer;
+  }
+
+  /* ── Table ── */
+  .table-th {
+    @apply px-4 py-3 text-left text-xs font-bold text-damco-black/70 uppercase tracking-wider
+           bg-gray-100 border-b border-gray-200;
+  }
+  .table-td {
+    @apply px-4 py-3 text-sm text-damco-black border-b border-gray-200;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold;
+  }
+
+  /* ── Page layout helpers ── */
+  .page-container {
+    @apply p-3 sm:p-4 lg:p-6 space-y-4 max-w-[1600px] mx-auto;
+  }
+  .page-title {
+    /* CHANGED: Utilizing Meiryo (display) and Damco Black */
+    @apply font-display text-lg sm:text-xl font-bold text-damco-black;
+  }
+
+  /* ── Mobile bottom nav ── */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-40 bg-damco-white border-t border-gray-200
+           flex items-center justify-around py-2 px-1 lg:hidden;
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+  }
+  .bottom-nav-item {
+    @apply flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg
+           text-damco-black/60 text-xs font-bold transition-colors duration-150;
+  }
+  .bottom-nav-item.active {
+    /* CHANGED: Active state uses Damco Red */
+    @apply text-damco-red;
+  }
+
+  /* ── Role badge colors (Using Damco Secondary/Tertiary Colors) ── */
+  .role-superadmin { @apply bg-damco-purple/10 text-damco-purple; }
+  .role-admin      { @apply bg-damco-red/10 text-damco-red; }
+  .role-manager    { @apply bg-damco-orange/10 text-damco-orange; }
+  /* Notice: Yellow background needs black text for high contrast (Page 12 of guidelines) */
+  .role-assignee   { @apply bg-damco-yellow/30 text-damco-black; }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.gray.200') transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  /* Safe area for mobile (iPhone notch etc.) */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+}

@@ -1,0 +1,81 @@
+version: '3.9'
+
+# FMS Docker Compose — v2.0
+# CHANGED: Added MailCatcher, removed Azure/demo config
+# NEW: JWT-based auth, bcrypt passwords
+
+services:
+  # ── Database ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: fms_postgres
+    environment:
+      POSTGRES_USER:     fms_user
+      POSTGRES_PASSWORD: fms_password
+      POSTGRES_DB:       fms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:     ["CMD-SHELL", "pg_isready -U fms_user -d fms_db"]
+      interval: 10s
+      timeout:  5s
+      retries:  5
+
+  # ── MailCatcher (email testing) ──
+  # Web UI: http://localhost:1080
+  # SMTP:   localhost:1025
+  mailcatcher:
+    image: sj26/mailcatcher:latest
+    container_name: fms_mailcatcher
+    ports:
+      - "1025:1025"   # SMTP
+      - "1080:1080"   # Web UI
+    restart: unless-stopped
+
+  # ── Backend ──
+  backend:
+    build:
+      context: ./backend
+      target:  production
+    container_name: fms_backend
+    environment:
+      NODE_ENV:        development
+      PORT:            3001
+      DATABASE_URL:    postgresql://fms_user:fms_password@postgres:5432/fms_db?schema=public
+      FRONTEND_URL:    http://localhost:3000
+      # JWT Auth (CHANGED: replaces Azure AD)
+      JWT_SECRET:      ${JWT_SECRET:-fms-damco-super-secret-key-change-in-production}
+      JWT_EXPIRES_IN:  24h
+      # MailCatcher
+      MAILCATCHER_HOST: mailcatcher
+      MAILCATCHER_PORT: 1025
+      SMTP_FROM:        noreply@damcogroup.com
+      AI_INSIGHTS_ENABLED: "false"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailcatcher:
+        condition: service_started
+    restart: unless-stopped
+    volumes:
+      - ./backend/logs:/app/logs
+
+  # ── Frontend ──
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ""
+    container_name: fms_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

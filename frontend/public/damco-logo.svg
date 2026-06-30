@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Damco logo</title>
+  <defs>
+    <radialGradient id="circleGradient" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#F2302D" />
+      <stop offset="100%" stop-color="#BE1F23" />
+    </radialGradient>
+    <linearGradient id="arrowGradient" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#F2302D" />
+      <stop offset="100%" stop-color="#C11B20" />
+    </linearGradient>
+  </defs>
+  <circle cx="48" cy="48" r="40" fill="url(#circleGradient)" />
+  <path d="M 24 54 C 27 40 34 32 46 28 C 58 24 70 26 78 34 C 86 42 84 52 78 60 C 72 68 60 74 48 74 C 36 74 28 68 24 60" stroke="#fff" stroke-width="4" fill="none" />
+  <path d="M 35 49 L 79 49" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+  <path d="M 48 15 L 48 80" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+  <path d="M 98 17 L 128 17 L 128 62" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 142 17 L 160 17 L 160 30" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 174 17 L 192 17 L 192 70" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 216 17 L 234 17 L 234 52" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 250 17 L 268 17 L 268 67" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 284 17 L 302 17 L 302 49" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <path d="M 316 17 L 334 17 L 334 73" stroke="#333" stroke-width="11" stroke-linecap="round" />
+  <text x="56" y="106" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="600" fill="#4B4B4B">Ensuring Your Success, Always.</text>
+</svg>
