@@ -72,14 +72,17 @@ export function FeedbackFormPage() {
 
   /* ─── Query: Fetch category assignees for selected category ─── */
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const { data: categoryAssignees = [] } = useQuery<CategoryAssignee[]>({
+  const { data } = useQuery({
     queryKey: ['category-assignees', selectedCategoryId],
-    queryFn: () =>
-      selectedCategoryId
-        ? categoryAssigneeApi.listByCategory(selectedCategoryId).then((r) => r.data)
-        : Promise.resolve([]),
+    queryFn: async (): Promise<CategoryAssignee[]> => {
+      if (!selectedCategoryId) return [];
+      const res = await categoryAssigneeApi.listByCategory(selectedCategoryId);
+      return res.data;
+    },
     enabled: !!selectedCategoryId,
   });
+
+  const categoryAssignees: CategoryAssignee[] = data ?? [];
 
   /* ─── Query: Fetch all assignees for secondary selection ─── */
   const { data: assignees = [] } = useQuery<Assignee[]>({
