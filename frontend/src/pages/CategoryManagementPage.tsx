@@ -10,7 +10,7 @@ import { categoryAssigneeApi } from '../services/categoryAssigneeApi';
 import { userMgmtApi, userApi } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Edit2, Check, X, ShieldAlert, UserPlus, Tag, UserMinus } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ShieldAlert, UserPlus, Tag, UserMinus, Search } from 'lucide-react';
 
 interface Employee {
   id?: number;
