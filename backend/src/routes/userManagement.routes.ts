@@ -101,14 +101,7 @@ router.post('/', requireRole(...SUPER_ONLY), async (req: AuthenticatedRequest, r
       return;
     }
 
-    // 3. Check if email already exists in Employee table but is assigned to a different code
-    const existingEmployeeByEmail = await prisma.employee.findUnique({
-      where: { email: normalizedEmail }
-    });
-    if (existingEmployeeByEmail && existingEmployeeByEmail.employeeCode !== normalizedCode) {
-      res.status(400).json({ error: `Email '${normalizedEmail}' is already registered under employee code '${existingEmployeeByEmail.employeeCode}'.` });
-      return;
-    }
+    // Validation 3 removed to allow updating the employeeCode of an existing Employee record when recreating a user
 
     const defaultPassword = password || 'damco@123';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
