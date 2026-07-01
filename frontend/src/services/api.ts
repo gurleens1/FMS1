@@ -3,8 +3,8 @@
  */
 import axios from 'axios';
 
-const env = (import.meta as any).env;
-const BASE_URL = env.VITE_API_BASE_URL || 'http://localhost:3001';
+// Use VITE_API_URL, fallback to localhost for local development
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -79,7 +79,6 @@ export const exportApi = {
     apiClient.get('/api/export/csv', { params, responseType: 'blob' }),
 };
 
-// FIXED: Added the required 'generate' and 'latest' routes so the Insights button works!
 export const insightsApi = {
   list: () => apiClient.get('/api/insights'),
   latest: () => apiClient.get('/api/insights/latest'),
