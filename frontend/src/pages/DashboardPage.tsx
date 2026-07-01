@@ -4,7 +4,8 @@ import { dashboardApi, exportApi } from '../services/api';
 import { EmployeeTableRow } from '../components/Dashboard/EmployeeRow';
 import { InsightsSummary } from '../components/Dashboard/InsightsSummary';
 import type { DashboardFilters, EmployeePageResult } from '../types';
-import { RefreshCw, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { RefreshCw, ChevronLeft, ChevronRight, Download, PieChart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 
 const DEFAULT_FILTERS: DashboardFilters = { tab: 'PulseCheck' };
@@ -28,6 +29,7 @@ export function DashboardPage() {
   const [page, setPage] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const formatParam = (val: string | string[] | undefined): string | undefined => {
     if (!val) return undefined;
@@ -118,6 +120,10 @@ export function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="font-display text-2xl font-bold text-damco-black">Dashboard</h2>
         <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/overview')} className="btn-primary text-xs bg-damco-red text-white font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2" style={{background: '#E32200'}}>
+            <PieChart size={14} />
+            Overview
+          </button>
           <button onClick={handleRefresh} disabled={isFetching} className="btn-secondary text-xs bg-white border-gray-200">
             <RefreshCw size={14} className={clsx(isFetching && 'animate-spin')} />
             Refresh

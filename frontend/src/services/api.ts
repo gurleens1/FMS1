@@ -41,6 +41,7 @@ export const authApi = {
 
 export const dashboardApi = {
   getSummary: (params?: any) => apiClient.get('/api/dashboard/summary', { params }),
+  getOverview: (params?: any) => apiClient.get('/api/dashboard/overview', { params }),
   getEmployees: (params: Record<string, string | number | undefined>) =>
     apiClient.get('/api/dashboard/employees', { params }),
   deleteParentTicket: (id: number) => apiClient.delete(`/api/feedback/parent/${id}`),

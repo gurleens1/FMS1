@@ -203,4 +203,51 @@ router.get('/employees', async (req: AuthenticatedRequest, res: Response): Promi
   }
 });
 
+// ── 3. GET /api/dashboard/overview ──
+router.get('/overview', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { month, year } = req.query;
+    
+    const where: any = {
+      status: { not: 'Deleted' },
+    };
+
+    if (month && year) {
+      const monthInt = parseInt(month as string);
+      const yearInt = parseInt(year as string);
+      const startDate = new Date(yearInt, monthInt - 1, 1);
+      const endDate = new Date(yearInt, monthInt, 1);
+      where.createdAt = {
+        gte: startDate,
+        lt: endDate,
+      };
+    }
+
+    const totalTickets = await prisma.feedbackTicket.count({ where });
+
+    const categories = await prisma.feedbackTicket.groupBy({
+      by: ['category'],
+      _count: { category: true },
+      where,
+      orderBy: { _count: { category: 'desc' } }
+    });
+
+    const sources = await prisma.feedbackTicket.groupBy({
+      by: ['feedbackSource'],
+      _count: { feedbackSource: true },
+      where,
+      orderBy: { _count: { feedbackSource: 'desc' } }
+    });
+
+    res.json({
+      total: totalTickets,
+      categories: categories.map(c => ({ name: c.category, count: c._count.category })),
+      sources: sources.map(s => ({ name: s.feedbackSource, count: s._count.feedbackSource }))
+    });
+  } catch (err) {
+    console.error("Dashboard Overview Error:", err);
+    res.status(500).json({ error: 'Failed to fetch overview data' });
+  }
+});
+
 export default router;

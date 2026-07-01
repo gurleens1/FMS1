@@ -11,10 +11,12 @@ import { AppShell } from './components/common/AppShell';
 import { LoginPage } from './pages/LoginPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { OverviewPage } from './pages/OverviewPage';
 import { FeedbackListPage } from './pages/FeedbackListPage';
 import { FeedbackFormPage } from './pages/FeedbackFormPage';
 import { TicketDetailPage } from './pages/TicketDetailPage';
 import { CategoryManagementPage } from './pages/CategoryManagementPage';
+import { VoiceBoxCategoriesPage } from './pages/VoiceBoxCategoriesPage';
 import { UserManagementPage } from './pages/UserManagementPage';
 import { PrivateRoute } from './components/common/PrivateRoute';
 import './index.css';
@@ -44,11 +46,13 @@ export default function App() {
               <Route element={<AppShell />}>
                 <Route path="/"                element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard"       element={<DashboardPage />} />
+                <Route path="/overview"        element={<OverviewPage />} />
                 <Route path="/feedback"        element={<FeedbackListPage />} />
                 <Route path="/feedback/new"    element={<FeedbackFormPage />} />
                 <Route path="/feedback/:id"    element={<TicketDetailPage />} />
                 {/* SuperAdmin + Admin only */}
                 <Route path="/category-management" element={<CategoryManagementPage />} />
+                <Route path="/voicebox-categories" element={<VoiceBoxCategoriesPage />} />
                 <Route path="/user-management" element={<UserManagementPage />} />
               </Route>
             </Route>

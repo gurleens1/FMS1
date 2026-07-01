@@ -20,6 +20,7 @@ const ALL_NAV: NavItem[] = [
   { to: '/feedback',       icon: 'fa-list-check',    label: 'Feedback List' },
   { to: '/user-management',icon: 'fa-users-gear', label: 'Users', roles: ['SuperAdmin'] },
   { to: '/category-management',icon: 'fa-tags', label: 'Category Management', roles: ['SuperAdmin'] },
+  { to: '/voicebox-categories',icon: 'fa-box', label: 'VoiceBox Categories', roles: ['SuperAdmin'] },
 ];
 export function AppShell() {
   const { user, logout } = useAuth();
@@ -134,7 +135,7 @@ export function AppShell() {
               <i className="fa-solid fa-bars text-lg" />
             </button>
             {/* Damco Logo Left Aligned and Increased Size */}
-            <img src="/logo.png" alt="logo" />
+            <img src="/logo.png" alt="logo" className="h-8 w-auto" />
           </div>
 
           <div className="flex-1 flex justify-center">
