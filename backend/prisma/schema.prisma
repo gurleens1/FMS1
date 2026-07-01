@@ -8,121 +8,112 @@ datasource db {
 }
 
 model Employee {
-  id           Int       @id @default(autoincrement())
-  employeeCode String    @unique @map("employee_code")
-  fullName     String    @map("full_name")
-  email        String    @unique
-  department   String?
-  designation  String?
-  joiningDate  DateTime? @map("joining_date")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-
-  userRole      UserRoleModel?
+  id            Int            @id @default(autoincrement())
+  employeeCode  String         @unique @map("employee_code")
+  fullName      String         @map("full_name")
+  email         String         @unique
+  department    String?
+  designation   String?
+  joiningDate   DateTime?      @map("joining_date")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
   parentTickets ParentTicket[]
+  userRole      UserRoleModel?
 
   @@map("employees")
 }
 
 model UserRoleModel {
-  id                Int       @id @default(autoincrement())
-  employeeId        Int       @unique @map("employee_id")
-  email             String    @unique
-  role              String    
-  isActive          Boolean   @default(true) @map("is_active")
-  password          String    
-  resetOtp          String?   @map("reset_otp")
-  resetOtpExpiry    DateTime? @map("reset_otp_expiry")
-  passwordChangedAt DateTime? @map("password_changed_at")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-
-  employee                 Employee         @relation(fields: [employeeId], references: [id])
-  assignedTickets          FeedbackTicket[] @relation("Assignee")
-  secondaryAssignedTickets FeedbackTicket[] @relation("SecondaryAssignee")
+  id                       Int                @id @default(autoincrement())
+  employeeId               Int                @unique @map("employee_id")
+  email                    String             @unique
+  role                     String
+  isActive                 Boolean            @default(true) @map("is_active")
+  password                 String
+  resetOtp                 String?            @map("reset_otp")
+  resetOtpExpiry           DateTime?          @map("reset_otp_expiry")
+  passwordChangedAt        DateTime?          @map("password_changed_at")
+  createdAt                DateTime           @default(now()) @map("created_at")
+  updatedAt                DateTime           @updatedAt @map("updated_at")
   activities               ActivityTracker[]
   assignedCategories       CategoryAssignee[] @relation("CategoryAssignees")
+  assignedTickets          FeedbackTicket[]   @relation("Assignee")
+  secondaryAssignedTickets FeedbackTicket[]   @relation("SecondaryAssignee")
+  employee                 Employee           @relation(fields: [employeeId], references: [id])
 
   @@map("user_roles")
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   primaryAssignees CategoryAssignee[]
 
   @@map("categories")
 }
 
 model CategoryAssignee {
-  id         Int      @id @default(autoincrement())
-  categoryId Int      @map("category_id")
-  assigneeId Int      @map("assignee_id")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id         Int           @id @default(autoincrement())
+  categoryId Int           @map("category_id")
+  assigneeId Int           @map("assignee_id")
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
   assignee   UserRoleModel @relation("CategoryAssignees", fields: [assigneeId], references: [id], onDelete: Cascade)
+  category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([categoryId, assigneeId])
   @@map("category_assignees")
 }
 
 model ParentTicket {
-  id             Int      @id @default(autoincrement())
-  employeeId     Int      @map("employee_id")
-  feedbackSource String   @map("feedback_source")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  employee       Employee         @relation(fields: [employeeId], references: [id])
-  childTickets   FeedbackTicket[]
+  id             Int              @id @default(autoincrement())
+  employeeId     Int              @map("employee_id")
+  feedbackSource String           @map("feedback_source")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
   recordings     CallRecording[]
+  childTickets   FeedbackTicket[]
+  employee       Employee         @relation(fields: [employeeId], references: [id])
 
   @@unique([employeeId, feedbackSource])
   @@map("parent_tickets")
 }
 
 model FeedbackTicket {
-  id                       Int       @id @default(autoincrement())
-  parentTicketId           Int       @map("parent_ticket_id")
-  assignmentNumber         Int       @unique @map("assignment_number")
-  feedbackSource           String    @map("feedback_source")
+  id                       Int                @id @default(autoincrement())
+  parentTicketId           Int                @map("parent_ticket_id")
+  assignmentNumber         Int                @unique @map("assignment_number")
+  feedbackSource           String             @map("feedback_source")
   category                 String
-  status                   String    @default("Open")
+  status                   String             @default("Open")
   priority                 String
   nature                   String?
-  assigneeId               Int?      @map("assignee_id")
-  // ADD THESE THREE LINES:
-  secondaryAssigneeId      Int?      @map("secondary_assignee_id")
+  assigneeId               Int?               @map("assignee_id")
+  secondaryAssigneeId      Int?               @map("secondary_assignee_id")
   feedbackTitle            String?
   description              String?
-  
   flag                     String?
-  isAnonymous              Boolean   @default(false) @map("is_anonymous")
-  isConfidential           Boolean   @default(false) @map("is_confidential")
-  feedbackRegistrationDate DateTime? @map("feedback_registration_date")
+  isAnonymous              Boolean            @default(false) @map("is_anonymous")
+  isConfidential           Boolean            @default(false) @map("is_confidential")
+  feedbackRegistrationDate DateTime?          @map("feedback_registration_date")
   notes                    String?
-  resolvedOn               DateTime? @map("resolved_on")
-  firstResponseAt          DateTime? @map("first_response_at")
-  createdAt                DateTime  @default(now()) @map("created_at")
-  updatedAt                DateTime  @updatedAt @map("updated_at")
-
-  empFullName    String?   @map("emp_full_name")
-  empEmail       String?   @map("emp_email")
-  empCode        String?   @map("emp_code")
-  empJoiningDate DateTime? @map("emp_joining_date")
-  empDesignation String?   @map("emp_designation")
-  empDepartment  String?   @map("emp_department")
-
-  parentTicket      ParentTicket   @relation(fields: [parentTicketId], references: [id])
-  assignee          UserRoleModel? @relation("Assignee", fields: [assigneeId], references: [id])
-  secondaryAssignee UserRoleModel? @relation("SecondaryAssignee", fields: [secondaryAssigneeId], references: [id])
-  activities        ActivityTracker[]
-  attachments       TicketAttachment[]
+  resolvedOn               DateTime?          @map("resolved_on")
+  firstResponseAt          DateTime?          @map("first_response_at")
+  createdAt                DateTime           @default(now()) @map("created_at")
+  updatedAt                DateTime           @updatedAt @map("updated_at")
+  empFullName              String?            @map("emp_full_name")
+  empEmail                 String?            @map("emp_email")
+  empCode                  String?            @map("emp_code")
+  empJoiningDate           DateTime?          @map("emp_joining_date")
+  empDesignation           String?            @map("emp_designation")
+  empDepartment            String?            @map("emp_department")
+  activities               ActivityTracker[]
+  assignee                 UserRoleModel?     @relation("Assignee", fields: [assigneeId], references: [id])
+  parentTicket             ParentTicket       @relation(fields: [parentTicketId], references: [id])
+  secondaryAssignee        UserRoleModel?     @relation("SecondaryAssignee", fields: [secondaryAssigneeId], references: [id])
+  attachments              TicketAttachment[]
 
   @@map("feedback_tracker")
 }
@@ -135,21 +126,19 @@ model TicketAttachment {
   mimeType         String         @map("mime_type")
   uploadedByRole   String         @map("uploaded_by_role")
   createdAt        DateTime       @default(now()) @map("created_at")
-
   feedbackTicket   FeedbackTicket @relation(fields: [feedbackTicketId], references: [id], onDelete: Cascade)
 
   @@map("ticket_attachments")
 }
 
 model ActivityTracker {
-  id          Int      @id @default(autoincrement())
-  feedbackId  Int      @map("feedback_id")
+  id          Int            @id @default(autoincrement())
+  feedbackId  Int            @map("feedback_id")
   action      String
-  performedBy Int      @map("performed_by")
-  oldValue    String?  @map("old_value")
-  newValue    String?  @map("new_value")
-  timestamp   DateTime @default(now())
-
+  performedBy Int            @map("performed_by")
+  oldValue    String?        @map("old_value")
+  newValue    String?        @map("new_value")
+  timestamp   DateTime       @default(now())
   feedback    FeedbackTicket @relation(fields: [feedbackId], references: [id])
   performer   UserRoleModel  @relation(fields: [performedBy], references: [id])
 
@@ -157,20 +146,19 @@ model ActivityTracker {
 }
 
 model CallRecording {
-  id                Int       @id @default(autoincrement())
-  parentTicketId    Int       @map("parent_ticket_id")
-  recordingId       String    @unique @map("recording_id")
-  recordingUrl      String?   @map("recording_url")
+  id                Int          @id @default(autoincrement())
+  parentTicketId    Int          @map("parent_ticket_id")
+  recordingId       String       @unique @map("recording_id")
+  recordingUrl      String?      @map("recording_url")
   category          String
-  durationSeconds   Int?      @map("duration_seconds")
-  recordedAt        DateTime? @map("recorded_at")
-  extractedInsights String?   @map("extracted_insights")
+  durationSeconds   Int?         @map("duration_seconds")
+  recordedAt        DateTime?    @map("recorded_at")
+  extractedInsights String?      @map("extracted_insights")
   transcription     String?
-  processingStatus  String    @default("pending") @map("processing_status")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-
-  parentTicket ParentTicket @relation(fields: [parentTicketId], references: [id])
+  processingStatus  String       @default("pending") @map("processing_status")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+  parentTicket      ParentTicket @relation(fields: [parentTicketId], references: [id])
 
   @@map("call_recordings")
 }
