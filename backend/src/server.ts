@@ -17,6 +17,7 @@ import dashboardRoutes from './routes/dashboard';
 import exportRoutes from './routes/export';
 import recordingsRoutes from './routes/recordings';
 import insightsRoutes from './routes/insights';
+import userMgmtRoutes from './routes/userManagement.routes';
 import { startFlagJob } from './jobs/flagJob';
 
 const app = express();
@@ -51,6 +52,7 @@ app.use('/api/dashboard', auth, dashboardRoutes);
 app.use('/api/export', auth, exportRoutes);
 app.use('/api/recordings', auth, recordingsRoutes);
 app.use('/api/insights', auth, insightsRoutes);
+app.use('/api/user-management', auth, userMgmtRoutes);
 
 app.use(errorHandler);
 
