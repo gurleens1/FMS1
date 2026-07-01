@@ -63,6 +63,7 @@ export function CategoryManagementPage() {
   const [activeSelectCategoryId, setActiveSelectCategoryId] = useState<number | null>(null);
   const [changingAssigneeKey, setChangingAssigneeKey] = useState<string | null>(null); // "catId-assigneeId"
   const [deleteAssigneeKey, setDeleteAssigneeKey] = useState<string | null>(null); // confirm delete
+  const [searchCategory, setSearchCategory] = useState('');
 
   /* ─── Queries ─── */
   // Fetch categories (GET /api/categories returns categories including primaryAssignees relation)
@@ -265,11 +266,30 @@ export function CategoryManagementPage() {
         )}
       </div>
 
+      {/* Search Category Panel */}
+      <div className="mb-4">
+        <div className="relative w-full sm:w-80">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-damco-red/20 focus:border-damco-red transition-all"
+            placeholder="Search categories..."
+            value={searchCategory}
+            onChange={(e) => setSearchCategory(e.target.value)}
+          />
+          {searchCategory && (
+            <button onClick={() => setSearchCategory('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Unified Categories & Assignees List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
           <h3 className="font-sans font-bold text-gray-900 text-sm">
-            Categories & Primary Auto-Assignees ({categories.length})
+            Categories & Primary Auto-Assignees ({categories.filter(c => c.name.toLowerCase().includes(searchCategory.toLowerCase())).length})
           </h3>
         </div>
 
@@ -301,7 +321,7 @@ export function CategoryManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {categories.map((cat) => {
+                {categories.filter(c => c.name.toLowerCase().includes(searchCategory.toLowerCase())).map((cat) => {
                   const assignedAssignees = cat.primaryAssignees || [];
                   const assignedAssigneeIds = new Set(assignedAssignees.map(ca => ca.assigneeId));
                   

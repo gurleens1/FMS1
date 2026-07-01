@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 export function OverviewPage() {
   const navigate = useNavigate();
-  const [month, setMonth] = useState('6'); // June
-  const [year, setYear] = useState('2026');
+  const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
+  const [year, setYear] = useState(new Date().getFullYear().toString());
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['dashboard-overview', month, year],

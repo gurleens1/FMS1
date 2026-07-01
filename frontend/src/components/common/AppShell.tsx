@@ -29,19 +29,25 @@ export function AppShell() {
   const location  = useLocation();
 
   const navItems = ALL_NAV.filter((item) =>
-    !item.roles || (user?.role && item.roles.includes(user.role))
+    !item.roles || (user?.role && item.roles.some(r => r.toLowerCase() === user?.role?.toLowerCase()))
   );
 
   const roleLabel: Record<string, string> = {
     SuperAdmin: 'Super Admin',
     Admin:      'Admin',
     Assignee:   'Assignee',
+    superadmin: 'Super Admin',
+    admin:      'Admin',
+    assignee:   'Assignee',
   };
 
   const roleColor: Record<string, string> = {
     SuperAdmin: 'bg-damco-purple text-damco-white',
     Admin:      'bg-damco-red text-damco-white',
-    Assignee:   'bg-damco-yellow text-damco-black', 
+    Assignee:   'bg-damco-yellow text-damco-black',
+    superadmin: 'bg-damco-purple text-damco-white',
+    admin:      'bg-damco-red text-damco-white',
+    assignee:   'bg-damco-yellow text-damco-black',
   };
 
   return (
@@ -135,7 +141,7 @@ export function AppShell() {
               <i className="fa-solid fa-bars text-lg" />
             </button>
             {/* Damco Logo Left Aligned and Increased Size */}
-            <img src="/logo.png" alt="logo" className="h-8 w-auto" />
+            <img src="/logo.png" alt="logo" className="h-10 sm:h-12 w-auto" />
           </div>
 
           <div className="flex-1 flex justify-center">

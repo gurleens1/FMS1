@@ -43,7 +43,7 @@ export function LoginPage() {
             <img
               src={damcoLogo} // 2. Use the imported logo variable here
               alt="Damco logo"
-              className="h-16 sm:h-20 w-auto object-contain mb-4"
+              className="h-20 sm:h-24 w-auto object-contain mb-4"
             />
           </div>
 
@@ -137,7 +137,7 @@ export function LoginPage() {
                 <div className="w-[8px] h-[8px] bg-[#00A4EF]" />
                 <div className="w-[8px] h-[8px] bg-[#FFB900]" />
               </div>
-              <span>{isLoggingIn ? 'Authenticating...' : 'Sign in with Microsoft'}</span>
+              <span>Sign in with Microsoft</span>
             </button>
           </div>
 

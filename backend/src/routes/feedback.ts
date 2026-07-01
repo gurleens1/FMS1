@@ -117,12 +117,45 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { role, userId } = req.user!;
     const isAdmin = role === 'SuperAdmin' || role === 'Admin';
-    const whereClause: any = { status: { not: 'Deleted' } };
+    const { search, status, priority, nature, source, category, assigneeId, dateFrom, dateTo } = req.query as Record<string, string>;
+    const whereClause: any = { status: { not: 'Deleted' }, AND: [] };
+
     if (!isAdmin) {
-      whereClause.OR = [
-        { assigneeId: Number(userId) },
-        { secondaryAssigneeId: Number(userId) }
-      ];
+      whereClause.AND.push({
+        OR: [
+          { assigneeId: Number(userId) },
+          { secondaryAssigneeId: Number(userId) }
+        ]
+      });
+    }
+
+    if (status) whereClause.status = status;
+    if (priority) whereClause.priority = priority;
+    if (nature) whereClause.nature = nature;
+    if (source) whereClause.feedbackSource = source;
+    if (category) whereClause.category = category;
+    if (assigneeId) whereClause.assigneeId = Number(assigneeId);
+
+    if (dateFrom || dateTo) {
+      const dateFilter: any = {};
+      if (dateFrom) dateFilter.gte = new Date(`${dateFrom}T00:00:00.000Z`);
+      if (dateTo) dateFilter.lte = new Date(`${dateTo}T23:59:59.999Z`);
+      whereClause.createdAt = dateFilter;
+    }
+
+    if (search) {
+      whereClause.AND.push({
+        OR: [
+          { empFullName: { contains: search } },
+          { empEmail: { contains: search } },
+          { category: { contains: search } },
+          { feedbackSource: { contains: search } }
+        ]
+      });
+    }
+
+    if (whereClause.AND.length === 0) {
+      delete whereClause.AND;
     }
 
     const tickets = await prisma.feedbackTicket.findMany({

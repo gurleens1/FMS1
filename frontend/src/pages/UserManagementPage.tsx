@@ -144,6 +144,7 @@ export function UserManagementPage() {
           onChange={(e) => setRoleFilter(e.target.value)}
         >
           <option value="" disabled hidden>Role</option>
+          <option value="SuperAdmin">SuperAdmin</option>
           <option value="Admin">Admin</option>
           <option value="Assignee">Assignee</option>
         </select>
@@ -325,7 +326,7 @@ function UserFormModal({
     employeeCode: user?.employee.employeeCode || '',
     department:   user?.employee.department || '',
     designation:  user?.employee.designation || '',
-    role:         (user?.role === 'SuperAdmin' ? 'Admin' : (user?.role || 'Assignee')) as UserRole,
+    role:         (user?.role || 'Assignee') as UserRole,
     isActive:     user?.isActive ?? true,
   });
 
@@ -412,6 +413,7 @@ function UserFormModal({
             <div>
               <label className="form-label font-bold text-xs"><i className="fa-solid fa-shield-halved mr-1.5 text-gray-400" />Role *</label>
               <select className="form-select outline-none focus:ring-0 focus:border-damco-red" value={form.role} onChange={set('role') as any}>
+                <option value="SuperAdmin">SuperAdmin</option>
                 <option value="Admin">Admin</option>
                 <option value="Assignee">Assignee</option>
               </select>
