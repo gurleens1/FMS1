@@ -197,16 +197,31 @@ router.delete('/:id', requireRole(...SUPER_ONLY), async (req: AuthenticatedReque
       return;
     }
 
-    // Delete login access AND employee record
-    await prisma.$transaction([
-      prisma.userRoleModel.delete({ where: { id } }),
-      prisma.employee.delete({ where: { id: user.employeeId } })
-    ]);
+    // Nullify references in FeedbackTicket so we don't hit Foreign Key constraints
+    await prisma.feedbackTicket.updateMany({
+      where: { assigneeId: id },
+      data: { assigneeId: null }
+    });
+    
+    await prisma.feedbackTicket.updateMany({
+      where: { secondaryAssigneeId: id },
+      data: { secondaryAssigneeId: null }
+    });
+
+    // Delete ActivityTracker records created by this user to avoid FK violations
+    await prisma.activityTracker.deleteMany({
+      where: { performedBy: id }
+    });
+
+    // Delete the login access (UserRoleModel). 
+    // CategoryAssignee records will cascade delete.
+    // We intentionally leave the Employee record intact because they might have submitted tickets (ParentTicket).
+    await prisma.userRoleModel.delete({ where: { id } });
 
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     logger.error('Error deleting user:', error);
-    res.status(500).json({ error: 'Failed to delete user' });
+    res.status(500).json({ error: 'Failed to delete user due to a server error.' });
   }
 });
 

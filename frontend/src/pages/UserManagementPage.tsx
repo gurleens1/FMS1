@@ -231,7 +231,7 @@ export function UserManagementPage() {
                                 title={u.isActive ? 'Deactivate' : 'Activate'}>
                                 <i className={`fa-solid ${u.isActive ? 'fa-user-slash' : 'fa-user-check'}`} />
                               </button>
-                              <button onClick={() => { if (confirm(`Deactivate ${u.employee.fullName}?`)) deleteUser.mutate(u.id); }}
+                              <button onClick={() => { if (confirm(`Delete ${u.employee.fullName}?`)) deleteUser.mutate(u.id); }}
                                 className="p-2 rounded text-red-600 hover:bg-red-50 transition-colors" title="Delete">
                                 <i className="fa-solid fa-trash text-sm" />
                               </button>
@@ -281,7 +281,7 @@ export function UserManagementPage() {
                       <button onClick={() => { setEditUser(u); setShowForm(true); }} className="btn-ghost p-2 rounded text-blue-600 hover:bg-blue-50">
                         <i className="fa-solid fa-pen-to-square" />
                       </button>
-                      <button onClick={() => { if (confirm(`Deactivate ${u.employee.fullName}?`)) deleteUser.mutate(u.id); }} className="btn-ghost p-2 rounded text-red-600 hover:bg-red-50">
+                      <button onClick={() => { if (confirm(`Delete ${u.employee.fullName}?`)) deleteUser.mutate(u.id); }} className="btn-ghost p-2 rounded text-red-600 hover:bg-red-50">
                         <i className="fa-solid fa-trash" />
                       </button>
                     </div>
