@@ -27,24 +27,57 @@ router.get('/csv', async (req: AuthenticatedRequest, res: Response): Promise<voi
     const { role, userId } = req.user!;
     const isAdmin = role === 'SuperAdmin' || role === 'Admin';
 
-    // Grab the exact same filters sent from the dashboard
-    const { tab = 'PulseCheck', status, priority, nature } = req.query as Record<string, string>;
-
-    const sourceFilter = buildSourceFilter(tab);
+    // Grab the exact same filters sent from the dashboard and feedback list
+    const { 
+      tab, search, status, priority, nature, source, category, assigneeId, dateFrom, dateTo, flag 
+    } = req.query as Record<string, string>;
 
     const where: any = {
-      feedbackSource: sourceFilter,
       status: { not: 'Deleted' },
-      ...(status ? { status: { in: status.split(',') } } : {}),
-      ...(priority ? { priority: { in: priority.split(',') } } : {}),
-      ...(nature ? { nature: { in: nature.split(',') } } : {}),
+      AND: []
     };
 
+    if (tab) {
+      where.feedbackSource = buildSourceFilter(tab);
+    }
+    
+    if (status) where.status = { in: status.split(',') };
+    if (priority) where.priority = { in: priority.split(',') };
+    if (nature) where.nature = { in: nature.split(',') };
+    if (source) where.feedbackSource = source; 
+    if (category) where.category = category;
+    if (assigneeId) where.assigneeId = Number(assigneeId);
+    if (flag) where.flag = flag;
+
+    if (dateFrom || dateTo) {
+      const dateFilter: any = {};
+      if (dateFrom) dateFilter.gte = new Date(`${dateFrom}T00:00:00.000Z`);
+      if (dateTo) dateFilter.lte = new Date(`${dateTo}T23:59:59.999Z`);
+      where.createdAt = dateFilter;
+    }
+
+    if (search) {
+      where.AND.push({
+        OR: [
+          { empFullName: { contains: search } },
+          { empEmail: { contains: search } },
+          { category: { contains: search } },
+          { feedbackSource: { contains: search } }
+        ]
+      });
+    }
+
     if (!isAdmin) {
-      where.OR = [
-        { assigneeId: userId },
-        { secondaryAssigneeId: userId }
-      ];
+      where.AND.push({
+        OR: [
+          { assigneeId: Number(userId) },
+          { secondaryAssigneeId: Number(userId) }
+        ]
+      });
+    }
+
+    if (where.AND.length === 0) {
+      delete where.AND;
     }
 
     const tickets = await prisma.feedbackTicket.findMany({
