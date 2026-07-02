@@ -67,7 +67,18 @@ router.get('/external-lookup', async (req: AuthenticatedRequest, res: Response):
       httpsAgent
     });
 
-    const employees: any[] = response.data;
+    let employees: any[] = [];
+    if (Array.isArray(response.data)) {
+      employees = response.data;
+    } else if (response.data && Array.isArray(response.data.data)) {
+      employees = response.data.data;
+    } else if (response.data && Array.isArray(response.data.employees)) {
+      employees = response.data.employees;
+    } else {
+      console.error('Unexpected data type from external API:', typeof response.data, response.data);
+      res.status(500).json({ error: 'Unexpected API response format' });
+      return;
+    }
     
     // Filter locally by name or email
     const filtered = employees.filter(e => 
@@ -78,7 +89,11 @@ router.get('/external-lookup', async (req: AuthenticatedRequest, res: Response):
     res.json(filtered);
   } catch (err: any) {
     console.error('External API error:', err?.message || err);
-    res.status(500).json({ error: 'Failed to fetch from external API' });
+    if (err.response) {
+       console.error('External API status:', err.response.status);
+       console.error('External API data:', err.response.data);
+    }
+    res.status(500).json({ error: 'Failed to fetch from external API. Check backend logs for details.' });
   }
 });
 
