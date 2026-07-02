@@ -4,6 +4,7 @@
  */
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { apiClient } from '../services/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ─────────────────────────────────────────────
 // Types
@@ -126,11 +127,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const queryClient = useQueryClient();
+
   // Logout
   const logout = useCallback(() => {
+    queryClient.clear();
     clearAuth();
     setUser(null);
-  }, []);
+  }, [queryClient]);
 
   const getToken = useCallback(() => getStoredToken(), []);
 
