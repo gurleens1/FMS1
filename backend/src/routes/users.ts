@@ -42,7 +42,7 @@ router.get('/assignees', async (_req: AuthenticatedRequest, res: Response): Prom
 
     res.json(assignees.map((u) => ({
       id: u.id,
-      name: u.employee.fullName,
+      name: u.employee?.fullName || 'Unknown Employee',
       email: u.email,
       role: u.role,
     })));

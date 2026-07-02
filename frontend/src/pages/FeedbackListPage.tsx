@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { feedbackApi, userApi, exportApi } from '../services/api';
+import { categoryApi } from '../services/categoryApi';
 import type { FeedbackTicket, Assignee, PaginationMeta } from '../types';
 import { StatusBadge, PriorityBadge, FlagBadge } from '../components/common/Badges';
 import { Search, X, Download, RefreshCw, Eye, Filter, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
@@ -41,15 +42,7 @@ const SOURCE_OPTIONS = [
   'Others', 'Pulse Check', 'Voice Box'
 ];
  
-const CATEGORY_OPTIONS = [
-  'Admin and Facilities', 'Career Progression', 'Compensation and Benefits', 'Culture',
-  'Diversity and Inclusion', 'Employee Engagement', 'Exit Experience', 'Finance',
-  'Health and Safety', 'Internal Communication', 'IT Infrastructure', 'Learning and Development (L&D)',
-  'Leave and Attendance', 'Manager Behavior', 'Mental Health & Well-Being', 'N&B',
-  'Onboarding', 'Organization Policies', 'Others', 'Performance Management',
-  'Project/Work Alignment', 'Recruitment', 'Rewards and Recognition (R&R)',
-  'Social Impact', 'Top Management', 'Work - Life Balance', 'Workplace Relationships'
-];
+// Categories will be fetched dynamically
  
 const STATUS_OPTIONS = ['New', 'Acknowledged', 'In Progress', 'Resolved', 'Closed', 'CWC'];
 const PRIORITY_OPTIONS = ['High', 'Medium', 'Low'];
@@ -124,6 +117,12 @@ export function FeedbackListPage() {
     queryKey: ['assignees'],
     queryFn:  () => userApi.assignees().then((r) => r.data),
     enabled:  isAdmin,
+    staleTime: 300_000,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryApi.list().then((r) => r.data),
     staleTime: 300_000,
   });
  
@@ -248,7 +247,7 @@ export function FeedbackListPage() {
               <label className="form-label text-xs">Category</label>
               <select value={filters.category} onChange={(e) => setFilter('category', e.target.value)} className="form-select text-xs py-1.5 w-44">
                 <option value="">Category</option>
-                {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+                {categories.map((c: any) => <option key={c.id} value={c.name}>{c.name}</option>)}
               </select>
             </div>
  

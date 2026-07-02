@@ -129,7 +129,10 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    if (status) whereClause.status = status;
+    if (status) {
+      const statusList = status.split(',').map(s => s === 'New' ? 'Open' : s);
+      whereClause.status = { in: statusList };
+    }
     if (priority) whereClause.priority = priority;
     if (nature) whereClause.nature = nature;
     if (source) whereClause.feedbackSource = source;
