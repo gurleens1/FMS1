@@ -70,7 +70,7 @@ const EMPTY_FILTERS: Filters = {
  
 export function FeedbackListPage() {
   const navigate   = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSuperAdmin } = useAuth();
   const [searchParams] = useSearchParams();
  
   const [filters, setFilters] = useState<Filters>({
@@ -116,7 +116,7 @@ export function FeedbackListPage() {
   const { data: assignees = [] } = useQuery<Assignee[]>({
     queryKey: ['assignees'],
     queryFn:  () => userApi.assignees().then((r) => r.data),
-    enabled:  isAdmin,
+    enabled:  isAdmin || isSuperAdmin,
     staleTime: 300_000,
   });
 
