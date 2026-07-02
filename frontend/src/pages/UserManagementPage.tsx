@@ -438,14 +438,14 @@ function UserFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {!isEdit && (
               <>
-                <div className="sm:col-span-1">
+                <div className="sm:col-span-2">
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-magnifying-glass mr-1.5 text-gray-400" />Employee Name Lookup</label>
                   <div className="flex gap-2">
                     <input type="text" placeholder="Search by name" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={empNameSearch} onChange={(e) => setEmpNameSearch(e.target.value)} autoComplete="off" data-lpignore="true" />
                     <button type="button" onClick={() => lookupEmployee(empNameSearch)} className="bg-damco-red text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-damco-red/90 transition-colors">Lookup</button>
                   </div>
                 </div>
-                <div className="sm:col-span-1">
+                <div className="sm:col-span-2">
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-magnifying-glass mr-1.5 text-gray-400" />Employee Email Lookup</label>
                   <div className="flex gap-2">
                     <input type="text" placeholder="Search by email" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={empEmailSearch} onChange={(e) => setEmpEmailSearch(e.target.value)} autoComplete="off" data-lpignore="true" />
