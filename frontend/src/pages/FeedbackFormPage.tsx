@@ -43,9 +43,11 @@ export function FeedbackFormPage() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isConfidential, setIsConfidential] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [empEmail, setEmpEmail] = useState('');
-  const [empLookup, setEmpLookup] = useState<Employee | null>(null);
+  const [empSearch, setEmpSearch] = useState('');
+  const [empLookup, setEmpLookup] = useState<any | null>(null);
   const [lookupError, setLookupError] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -104,25 +106,41 @@ export function FeedbackFormPage() {
     }
   }, [success, navigate]);
 
-  async function lookupEmployee(email: string) {
-    if (!email || isAnonymous) return;
+  async function lookupEmployee(query: string) {
+    if (!query || isAnonymous) return;
     setLookupError('');
     try {
-      const { data } = await employeeApi.lookup(email.toLowerCase());
-      setEmpLookup(data);
-      setForm((f) => ({
-        ...f,
-        empFullName: data.fullName || '',
-        empCode: data.employeeCode || '',
-        empDesignation: data.designation || '',
-        empDepartment: '',
-        empDivision: data.department || '', 
-        empJoiningDate: data.joiningDate ? formatDisplayDate(new Date(data.joiningDate)) : 'Mon, 24 March, 2025',
-      }));
+      const { data } = await employeeApi.externalLookup(query);
+      if (data && data.length > 0) {
+        if (data.length === 1) {
+          selectEmployee(data[0]);
+        } else {
+          setSearchResults(data);
+          setShowSearchModal(true);
+        }
+      } else {
+        setEmpLookup(null);
+        setLookupError('Employee not found.');
+      }
     } catch {
       setEmpLookup(null);
       setLookupError('Employee not found.');
     }
+  }
+
+  function selectEmployee(data: any) {
+    setEmpLookup(data);
+    setShowSearchModal(false);
+    setEmpSearch(data.email || data.fullName || '');
+    setForm((f) => ({
+      ...f,
+      empFullName: data.fullName || '',
+      empCode: data.empCode || data.employeeCode || '',
+      empDesignation: data.designation || '',
+      empDepartment: data.department || '',
+      empDivision: data.division || data.department || '', 
+      empJoiningDate: data.doj || data.joiningDate || '',
+    }));
   }
 
   const createMutation = useMutation({
@@ -140,7 +158,7 @@ export function FeedbackFormPage() {
     if (!form.priority) e.priority = 'Priority is required';
     if (!form.primaryAssigneeId) e.primaryAssigneeId = 'Assignee is required';
     if (!form.description) e.description = 'Description is required';
-    if (!isAnonymous && !empEmail) e.empEmail = 'Employee email is required';
+    if (!isAnonymous && !empLookup) e.empSearch = 'Please lookup and select an employee';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -186,7 +204,7 @@ export function FeedbackFormPage() {
       isAnonymous: Boolean(isAnonymous),
       isConfidential: Boolean(isConfidential),
       feedbackRegistrationDate: todayISO,
-      empEmail: isAnonymous ? "" : (empEmail.toLowerCase() || ""),
+      empEmail: isAnonymous ? "" : (empLookup?.email || ""),
       empFullName: isAnonymous ? "Anonymous" : (form.empFullName || ""),
       empCode: isAnonymous ? "" : (form.empCode || ""),
       empJoiningDate: isAnonymous ? "" : (form.empJoiningDate || ""),
@@ -375,15 +393,15 @@ export function FeedbackFormPage() {
           {!isAnonymous ? (
             <div className="space-y-4">
               <div>
-                <label className="form-label">Employee Email *</label>
+                <label className="form-label">Employee Name or Email *</label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="email" value={empEmail} onChange={(e) => setEmpEmail(e.target.value)} onBlur={() => lookupEmployee(empEmail)} placeholder="employee@damcogroup.com" className={clsx('form-input pl-9 focus:ring-0 focus:border-damco-red', (errors.empEmail || lookupError) && 'border-red-500')} />
+                    <input type="text" value={empSearch} onChange={(e) => setEmpSearch(e.target.value)} placeholder="Search by name or email" className={clsx('form-input pl-9 focus:ring-0 focus:border-damco-red', (errors.empSearch || lookupError) && 'border-red-500')} />
                   </div>
-                  <button type="button" onClick={() => lookupEmployee(empEmail)} className="btn-secondary text-sm font-bold px-4">Lookup</button>
+                  <button type="button" onClick={() => lookupEmployee(empSearch)} className="btn-secondary text-sm font-bold px-4">Lookup</button>
                 </div>
-                {errors.empEmail && <p className="text-red-500 font-bold text-xs mt-1">{errors.empEmail}</p>}
+                {errors.empSearch && <p className="text-red-500 font-bold text-xs mt-1">{errors.empSearch}</p>}
                 {empLookup && <p className="text-emerald-600 font-bold text-xs mt-1 flex items-center gap-1"><CheckCircle size={11} /> Found: {empLookup.fullName}</p>}
               </div>
 
@@ -435,6 +453,38 @@ export function FeedbackFormPage() {
           </button>
         </div>
       </form>
+
+      {showSearchModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="font-bold text-lg text-damco-black">Select Employee</h3>
+              <button onClick={() => setShowSearchModal(false)} className="text-gray-400 hover:text-gray-600 font-bold p-1">✕</button>
+            </div>
+            <div className="overflow-y-auto p-4 flex-1">
+              {searchResults.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">No employees found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {searchResults.map((emp, i) => (
+                    <div key={i} onClick={() => selectEmployee(emp)} className="p-3 border border-gray-100 rounded-lg hover:border-damco-red/30 hover:bg-damco-red/5 cursor-pointer transition-colors">
+                      <div className="font-bold text-damco-black text-sm">{emp.fullName}</div>
+                      <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                        <span>{emp.email}</span>
+                        <span>{emp.department}</span>
+                        <span>Code: {emp.empCode || emp.employeeCode}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-200 text-right">
+              <button onClick={() => setShowSearchModal(false)} className="btn-secondary text-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import axios from 'axios';
+import https from 'https';
 
 const router = Router();
 
@@ -42,6 +44,41 @@ router.get('/lookup', async (req: AuthenticatedRequest, res: Response): Promise<
     res.json(employee);
   } catch (err) {
     throw err;
+  }
+});
+
+// GET /api/employees/external-lookup?query=...
+router.get('/external-lookup', async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { query } = req.query as Record<string, string>;
+    if (!query || query.length < 2) {
+      res.status(400).json({ error: 'Provide at least 2 characters for search' });
+      return;
+    }
+    const q = query.toLowerCase();
+
+    // Set up https agent to bypass self-signed cert on .local if needed
+    const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    const apiUrl = 'https://damco-dev.damco.local:9001/api/ExternalFeedbackManagement/GetActiveEmployees';
+    const apiKey = process.env.EXTERNAL_API_KEY || 'Yg6m3L2Y1r4S8jv7M9fQkPpN0WbXcE5nUuA2zHtR6dCsVxJ8iG';
+
+    const response = await axios.get(apiUrl, {
+      headers: { 'X-Api-Key': apiKey },
+      httpsAgent
+    });
+
+    const employees: any[] = response.data;
+    
+    // Filter locally by name or email
+    const filtered = employees.filter(e => 
+      (e.fullName && e.fullName.toLowerCase().includes(q)) ||
+      (e.email && e.email.toLowerCase().includes(q))
+    );
+
+    res.json(filtered);
+  } catch (err: any) {
+    console.error('External API error:', err?.message || err);
+    res.status(500).json({ error: 'Failed to fetch from external API' });
   }
 });
 

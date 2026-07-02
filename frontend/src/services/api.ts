@@ -59,6 +59,7 @@ export const feedbackApi = {
 export const employeeApi = {
   list: () => apiClient.get('/api/employees'),
   lookup: (email: string) => apiClient.get('/api/employees/lookup', { params: { email } }),
+  externalLookup: (query: string) => apiClient.get('/api/employees/external-lookup', { params: { query } }),
 };
 
 export const userApi = {

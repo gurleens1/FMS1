@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userMgmtApi } from '../services/api';
+import { userMgmtApi, employeeApi } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -333,12 +333,48 @@ function UserFormModal({
   const [form, setForm] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
+  const [lookupError, setLookupError] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   useEffect(() => {
     setForm(initialFormState());
     setError('');
+    setLookupError('');
     setLoading(false);
   }, [user]);
+
+  async function lookupEmployee(query: string) {
+    if (!query) return;
+    setLookupError('');
+    try {
+      const { data } = await employeeApi.externalLookup(query);
+      if (data && data.length > 0) {
+        if (data.length === 1) {
+          selectEmployee(data[0]);
+        } else {
+          setSearchResults(data);
+          setShowSearchModal(true);
+        }
+      } else {
+        setLookupError('Employee not found.');
+      }
+    } catch {
+      setLookupError('Employee not found.');
+    }
+  }
+
+  function selectEmployee(data: any) {
+    setShowSearchModal(false);
+    setForm((f) => ({
+      ...f,
+      fullName: data.fullName || '',
+      email: data.email || '',
+      employeeCode: data.empCode || data.employeeCode || '',
+      department: data.division || data.department || '',
+      designation: data.designation || '',
+    }));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -401,8 +437,12 @@ function UserFormModal({
             {!isEdit && (
               <>
                 <div className="sm:col-span-2">
-                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-envelope mr-1.5 text-gray-400" />Email *</label>
-                  <input type="email" className="form-input outline-none focus:ring-0 focus:border-damco-red" value={form.email} onChange={set('email')} required autoComplete="new-password" data-lpignore="true" />
+                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-envelope mr-1.5 text-gray-400" />Name or Email *</label>
+                  <div className="flex gap-2">
+                    <input type="text" placeholder="Search by name or email" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={form.email} onChange={set('email')} required autoComplete="off" data-lpignore="true" />
+                    <button type="button" onClick={() => lookupEmployee(form.email)} className="bg-damco-red text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-damco-red/90 transition-colors">Lookup</button>
+                  </div>
+                  {lookupError && <p className="text-red-500 font-bold text-xs mt-1">{lookupError}</p>}
                 </div>
                 <div>
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-id-badge mr-1.5 text-gray-400" />Employee Code *</label>
@@ -451,13 +491,47 @@ function UserFormModal({
           )}
 
           <div className="flex gap-3 pt-4 border-t border-gray-200 mt-6">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center py-2 font-bold text-sm outline-none focus:outline-none">Cancel</button>
-            <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center py-2 font-bold text-sm outline-none focus:outline-none" style={{ background: '#E32200' }}>
-              {loading ? <i className="fa-solid fa-circle-notch fa-spin mr-2" /> : <i className={`fa-solid ${isEdit ? 'fa-floppy-disk' : 'fa-user-plus'} mr-2`} />}
-              {loading ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create User')}
+            <button type="button" onClick={onClose} className="px-5 py-2 rounded-lg text-gray-600 font-bold text-sm bg-gray-100 hover:bg-gray-200 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading} className="px-5 py-2 rounded-lg text-white font-bold text-sm bg-damco-red hover:bg-damco-red/90 transition-colors shadow flex items-center gap-2">
+              {loading && <i className="fa-solid fa-spinner animate-spin" />}
+              {isEdit ? 'Save Changes' : 'Create User'}
             </button>
           </div>
         </form>
+
+        {showSearchModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="font-bold text-lg text-damco-black">Select Employee</h3>
+                <button type="button" onClick={() => setShowSearchModal(false)} className="text-gray-400 hover:text-gray-600 font-bold p-1">✕</button>
+              </div>
+              <div className="overflow-y-auto p-4 flex-1">
+                {searchResults.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">No employees found.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {searchResults.map((emp, i) => (
+                      <div key={i} onClick={() => selectEmployee(emp)} className="p-3 border border-gray-100 rounded-lg hover:border-damco-red/30 hover:bg-damco-red/5 cursor-pointer transition-colors">
+                        <div className="font-bold text-damco-black text-sm">{emp.fullName}</div>
+                        <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                          <span>{emp.email}</span>
+                          <span>{emp.department}</span>
+                          <span>Code: {emp.empCode || emp.employeeCode}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="p-4 border-t border-gray-200 text-right">
+                <button type="button" onClick={() => setShowSearchModal(false)} className="px-4 py-2 text-sm font-bold bg-gray-100 rounded hover:bg-gray-200">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
