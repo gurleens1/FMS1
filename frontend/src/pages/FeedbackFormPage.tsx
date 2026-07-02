@@ -43,7 +43,8 @@ export function FeedbackFormPage() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isConfidential, setIsConfidential] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [empSearch, setEmpSearch] = useState('');
+  const [empNameSearch, setEmpNameSearch] = useState('');
+  const [empEmailSearch, setEmpEmailSearch] = useState('');
   const [empLookup, setEmpLookup] = useState<any | null>(null);
   const [lookupError, setLookupError] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -131,7 +132,8 @@ export function FeedbackFormPage() {
   function selectEmployee(data: any) {
     setEmpLookup(data);
     setShowSearchModal(false);
-    setEmpSearch(data.email || data.fullName || '');
+    setEmpNameSearch(data.fullName || '');
+    setEmpEmailSearch(data.email || '');
     setForm((f) => ({
       ...f,
       empFullName: data.fullName || '',
@@ -392,18 +394,30 @@ export function FeedbackFormPage() {
 
           {!isAnonymous ? (
             <div className="space-y-4">
-              <div>
-                <label className="form-label">Employee Name or Email *</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" value={empSearch} onChange={(e) => setEmpSearch(e.target.value)} placeholder="Search by name or email" className={clsx('form-input pl-9 focus:ring-0 focus:border-damco-red', (errors.empSearch || lookupError) && 'border-red-500')} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="form-label">Employee Name Lookup</label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input type="text" value={empNameSearch} onChange={(e) => setEmpNameSearch(e.target.value)} placeholder="Search by name" className={clsx('form-input pl-9 focus:ring-0 focus:border-damco-red', (errors.empSearch || lookupError) && 'border-red-500')} />
+                    </div>
+                    <button type="button" onClick={() => lookupEmployee(empNameSearch)} className="btn-secondary text-sm font-bold px-4">Lookup</button>
                   </div>
-                  <button type="button" onClick={() => lookupEmployee(empSearch)} className="btn-secondary text-sm font-bold px-4">Lookup</button>
                 </div>
-                {errors.empSearch && <p className="text-red-500 font-bold text-xs mt-1">{errors.empSearch}</p>}
-                {empLookup && <p className="text-emerald-600 font-bold text-xs mt-1 flex items-center gap-1"><CheckCircle size={11} /> Found: {empLookup.fullName}</p>}
+                <div>
+                  <label className="form-label">Employee Email Lookup</label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input type="text" value={empEmailSearch} onChange={(e) => setEmpEmailSearch(e.target.value)} placeholder="Search by email" className={clsx('form-input pl-9 focus:ring-0 focus:border-damco-red', (errors.empSearch || lookupError) && 'border-red-500')} />
+                    </div>
+                    <button type="button" onClick={() => lookupEmployee(empEmailSearch)} className="btn-secondary text-sm font-bold px-4">Lookup</button>
+                  </div>
+                </div>
               </div>
+              {errors.empSearch && <p className="text-red-500 font-bold text-xs mt-1">{errors.empSearch}</p>}
+              {empLookup && <p className="text-emerald-600 font-bold text-xs mt-1 flex items-center gap-1"><CheckCircle size={11} /> Found: {empLookup.fullName}</p>}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="sm:col-span-2 md:col-span-1">

@@ -334,6 +334,8 @@ function UserFormModal({
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
   const [lookupError, setLookupError] = useState('');
+  const [empNameSearch, setEmpNameSearch] = useState('');
+  const [empEmailSearch, setEmpEmailSearch] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
 
@@ -341,6 +343,8 @@ function UserFormModal({
     setForm(initialFormState());
     setError('');
     setLookupError('');
+    setEmpNameSearch('');
+    setEmpEmailSearch('');
     setLoading(false);
   }, [user]);
 
@@ -366,6 +370,8 @@ function UserFormModal({
 
   function selectEmployee(data: any) {
     setShowSearchModal(false);
+    setEmpNameSearch(data.fullName || '');
+    setEmpEmailSearch(data.email || '');
     setForm((f) => ({
       ...f,
       fullName: data.fullName || '',
@@ -430,23 +436,40 @@ function UserFormModal({
           <input type="password" style={{ display: 'none' }} aria-hidden="true" autoComplete="new-password" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {!isEdit && (
+              <>
+                <div className="sm:col-span-1">
+                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-magnifying-glass mr-1.5 text-gray-400" />Employee Name Lookup</label>
+                  <div className="flex gap-2">
+                    <input type="text" placeholder="Search by name" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={empNameSearch} onChange={(e) => setEmpNameSearch(e.target.value)} autoComplete="off" data-lpignore="true" />
+                    <button type="button" onClick={() => lookupEmployee(empNameSearch)} className="bg-damco-red text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-damco-red/90 transition-colors">Lookup</button>
+                  </div>
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-magnifying-glass mr-1.5 text-gray-400" />Employee Email Lookup</label>
+                  <div className="flex gap-2">
+                    <input type="text" placeholder="Search by email" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={empEmailSearch} onChange={(e) => setEmpEmailSearch(e.target.value)} autoComplete="off" data-lpignore="true" />
+                    <button type="button" onClick={() => lookupEmployee(empEmailSearch)} className="bg-damco-red text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-damco-red/90 transition-colors">Lookup</button>
+                  </div>
+                </div>
+                {lookupError && <div className="sm:col-span-2"><p className="text-red-500 font-bold text-xs">{lookupError}</p></div>}
+              </>
+            )}
+
             <div className="sm:col-span-2">
               <label className="form-label font-bold text-xs"><i className="fa-solid fa-user mr-1.5 text-gray-400" />Full Name *</label>
               <input className="form-input outline-none focus:ring-0 focus:border-damco-red" value={form.fullName} onChange={set('fullName')} required autoComplete="off" data-lpignore="true" />
             </div>
+
             {!isEdit && (
               <>
-                <div className="sm:col-span-2">
-                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-envelope mr-1.5 text-gray-400" />Name or Email *</label>
-                  <div className="flex gap-2">
-                    <input type="text" placeholder="Search by name or email" className="form-input outline-none focus:ring-0 focus:border-damco-red flex-1" value={form.email} onChange={set('email')} required autoComplete="off" data-lpignore="true" />
-                    <button type="button" onClick={() => lookupEmployee(form.email)} className="bg-damco-red text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-damco-red/90 transition-colors">Lookup</button>
-                  </div>
-                  {lookupError && <p className="text-red-500 font-bold text-xs mt-1">{lookupError}</p>}
+                <div>
+                  <label className="form-label font-bold text-xs"><i className="fa-solid fa-envelope mr-1.5 text-gray-400" />Email *</label>
+                  <input type="email" className="form-input outline-none focus:ring-0 focus:border-damco-red bg-gray-50" value={form.email} onChange={set('email')} required autoComplete="off" data-lpignore="true" />
                 </div>
                 <div>
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-id-badge mr-1.5 text-gray-400" />Employee Code *</label>
-                  <input className="form-input outline-none focus:ring-0 focus:border-damco-red" placeholder="EMP-001" value={form.employeeCode} onChange={set('employeeCode')} required autoComplete="off" data-lpignore="true" />
+                  <input className="form-input outline-none focus:ring-0 focus:border-damco-red bg-gray-50" placeholder="EMP-001" value={form.employeeCode} onChange={set('employeeCode')} required autoComplete="off" data-lpignore="true" />
                 </div>
               </>
             )}
