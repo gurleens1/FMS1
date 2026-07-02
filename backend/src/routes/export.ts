@@ -41,7 +41,15 @@ router.get('/csv', async (req: AuthenticatedRequest, res: Response): Promise<voi
       where.feedbackSource = buildSourceFilter(tab);
     }
     
-    if (status) where.status = { in: status.split(',') };
+    if (status) {
+      where.status = { 
+        in: status.split(',').map(s => {
+          if (s === 'New') return 'Open';
+          if (s === 'In Progress') return 'InProgress';
+          return s;
+        }) 
+      };
+    }
     if (priority) where.priority = { in: priority.split(',') };
     if (nature) where.nature = { in: nature.split(',') };
     if (source) where.feedbackSource = source; 

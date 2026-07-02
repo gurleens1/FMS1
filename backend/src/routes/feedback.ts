@@ -130,7 +130,11 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
     }
 
     if (status) {
-      const statusList = status.split(',').map(s => s === 'New' ? 'Open' : s);
+      const statusList = status.split(',').map(s => {
+        if (s === 'New') return 'Open';
+        if (s === 'In Progress') return 'InProgress';
+        return s;
+      });
       whereClause.status = { in: statusList };
     }
     if (priority) whereClause.priority = priority;
