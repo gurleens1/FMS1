@@ -24,9 +24,13 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     });
     const nextAssignmentNumber = (lastTicket?.assignmentNumber || 0) + 1;
 
-    let finalName = empFullName || req.user?.name;
-    let finalCode = empCode;
+    let finalName = empFullName || req.user?.name || 'Unknown';
+    let finalCode = empCode ? String(empCode) : null;
     let finalEmail = empEmail || req.user?.email;
+
+    if (!finalEmail) {
+      finalEmail = `manual-${Date.now()}@fms.com`;
+    }
 
     if (isAnonymous) {
       const anonCount = await prisma.feedbackTicket.count({ where: { isAnonymous: true } });
@@ -43,18 +47,23 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
       }
     }
 
+    // Protect overwriting logged in user if this is clearly a manual entry for someone else
+    if (finalEmail === req.user?.email && empFullName && empFullName.toLowerCase() !== req.user?.name?.toLowerCase()) {
+       finalEmail = `manual-${Date.now()}@fms.com`;
+    }
+
     const employee = await prisma.employee.upsert({
       where: { email: finalEmail },
       update: { 
         fullName: finalName, 
-        employeeCode: String(finalCode), 
+        ...(finalCode ? { employeeCode: finalCode } : {}),
         department: empDepartment || "General",
         ...(finalJoiningDate ? { joiningDate: finalJoiningDate } : {})
       },
       create: { 
         email: finalEmail, 
         fullName: finalName, 
-        employeeCode: String(finalCode), 
+        ...(finalCode ? { employeeCode: finalCode } : {}),
         department: empDepartment || "General", 
         designation: empDesignation || "Employee",
         ...(finalJoiningDate ? { joiningDate: finalJoiningDate } : {})
@@ -83,7 +92,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
         notes: notes || '',
         empFullName: finalName,
         empEmail: finalEmail,
-        empCode: String(finalCode),
+        empCode: finalCode || '',
         empDepartment: empDepartment || "General",
         empDesignation: empDesignation || "Employee",
         empJoiningDate: finalJoiningDate || undefined,
