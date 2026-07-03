@@ -48,7 +48,8 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     }
 
     // Protect overwriting logged in user if this is clearly a manual entry for someone else
-    if (finalEmail === req.user?.email && empFullName && empFullName.toLowerCase() !== req.user?.name?.toLowerCase()) {
+    const reqUserName = req.user?.name || '';
+    if (finalEmail === req.user?.email && empFullName && empFullName.toLowerCase() !== reqUserName.toLowerCase()) {
        finalEmail = `manual-${Date.now()}@fms.com`;
     }
 
@@ -113,9 +114,12 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     });
 
     res.status(201).json(formatTicket(newTicket));
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Registration Error:', error);
-    res.status(500).json({ error: 'Failed to register feedback' });
+    res.status(500).json({ 
+      error: 'Failed to register feedback', 
+      details: error?.message || String(error) 
+    });
   }
 });
 
