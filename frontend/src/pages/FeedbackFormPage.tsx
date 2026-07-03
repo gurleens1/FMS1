@@ -422,33 +422,33 @@ export function FeedbackFormPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="sm:col-span-2 md:col-span-1">
                   <label className="form-label">Employee Full Name *</label>
-                  <input type="text" value={form.empFullName} readOnly={!!empLookup} onChange={(e) => F('empFullName', e.target.value)} className="form-input bg-gray-50 font-bold" placeholder="Auto-filled" />
+                  <input type="text" value={form.empFullName} onChange={(e) => F('empFullName', e.target.value)} className="form-input focus:ring-0 focus:border-damco-red" placeholder="Enter Full Name" />
                 </div>
                 <div>
                   <label className="form-label">Employee Code</label>
-                  <input type="text" value={empLookup ? (form.empCode || 'Not Provided') : ''} readOnly className="form-input bg-gray-50" placeholder="Auto-filled" />
+                  <input type="text" value={form.empCode} onChange={(e) => F('empCode', e.target.value)} className="form-input focus:ring-0 focus:border-damco-red" placeholder="Enter Code" />
                 </div>
                 <div>
                   <label className="form-label">Joining Date</label>
                   <input 
                     type="text" 
-                    value={empLookup ? (form.empJoiningDate || 'Not Provided') : ''} 
-                    readOnly 
-                    className="form-input bg-gray-50 font-medium text-gray-600" 
-                    placeholder="Auto-filled" 
+                    value={form.empJoiningDate} 
+                    onChange={(e) => F('empJoiningDate', e.target.value)}
+                    className="form-input focus:ring-0 focus:border-damco-red" 
+                    placeholder="Enter Joining Date" 
                   />
                 </div>
                 <div>
                   <label className="form-label">Designation</label>
-                  <input type="text" value={empLookup ? (form.empDesignation || 'Not Provided') : ''} readOnly className="form-input bg-gray-50" placeholder="Auto-filled" />
+                  <input type="text" value={form.empDesignation} onChange={(e) => F('empDesignation', e.target.value)} className="form-input focus:ring-0 focus:border-damco-red" placeholder="Enter Designation" />
                 </div>
                 <div>
                   <label className="form-label">Department</label>
-                  <input type="text" value={empLookup ? (form.empDepartment || '—') : ''} readOnly className="form-input bg-gray-50" placeholder="Auto-filled" />
+                  <input type="text" value={form.empDepartment} onChange={(e) => F('empDepartment', e.target.value)} className="form-input focus:ring-0 focus:border-damco-red" placeholder="Enter Department" />
                 </div>
                 <div>
                   <label className="form-label">Division *</label>
-                  <input type="text" value={empLookup ? (form.empDivision || 'Not Provided') : ''} readOnly className="form-input bg-gray-50 font-bold" placeholder="Auto-filled" />
+                  <input type="text" value={form.empDivision} onChange={(e) => F('empDivision', e.target.value)} className="form-input focus:ring-0 focus:border-damco-red" placeholder="Enter Division" />
                 </div>
               </div>
             </div>

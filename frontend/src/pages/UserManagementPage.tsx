@@ -465,11 +465,11 @@ function UserFormModal({
               <>
                 <div>
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-envelope mr-1.5 text-gray-400" />Email *</label>
-                  <input type="email" className="form-input outline-none focus:ring-0 focus:border-damco-red bg-gray-50" value={form.email} onChange={set('email')} required autoComplete="off" data-lpignore="true" />
+                  <input type="email" className="form-input outline-none focus:ring-0 focus:border-damco-red" value={form.email} onChange={set('email')} required autoComplete="off" data-lpignore="true" />
                 </div>
                 <div>
                   <label className="form-label font-bold text-xs"><i className="fa-solid fa-id-badge mr-1.5 text-gray-400" />Employee Code *</label>
-                  <input className="form-input outline-none focus:ring-0 focus:border-damco-red bg-gray-50" placeholder="EMP-001" value={form.employeeCode} onChange={set('employeeCode')} required autoComplete="off" data-lpignore="true" />
+                  <input className="form-input outline-none focus:ring-0 focus:border-damco-red" placeholder="EMP-001" value={form.employeeCode} onChange={set('employeeCode')} required autoComplete="off" data-lpignore="true" />
                 </div>
               </>
             )}
