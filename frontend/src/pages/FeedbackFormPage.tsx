@@ -160,7 +160,7 @@ export function FeedbackFormPage() {
     if (!form.priority) e.priority = 'Priority is required';
     if (!form.primaryAssigneeId) e.primaryAssigneeId = 'Assignee is required';
     if (!form.description) e.description = 'Description is required';
-    if (!isAnonymous && !empLookup) e.empSearch = 'Please lookup and select an employee';
+    if (!isAnonymous && !form.empFullName) e.empSearch = 'Please provide Employee Full Name';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -206,7 +206,7 @@ export function FeedbackFormPage() {
       isAnonymous: Boolean(isAnonymous),
       isConfidential: Boolean(isConfidential),
       feedbackRegistrationDate: todayISO,
-      empEmail: isAnonymous ? "" : (empLookup?.email || ""),
+      empEmail: isAnonymous ? "" : (empLookup?.email || empEmailSearch || ""),
       empFullName: isAnonymous ? "Anonymous" : (form.empFullName || ""),
       empCode: isAnonymous ? "" : (form.empCode || ""),
       empJoiningDate: isAnonymous ? "" : (form.empJoiningDate || ""),
