@@ -31,6 +31,10 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     if (!finalEmail) {
       finalEmail = `manual-${Date.now()}@fms.com`;
     }
+    
+    if (!finalCode) {
+      finalCode = `M-CODE-${Date.now()}`;
+    }
 
     if (isAnonymous) {
       const anonCount = await prisma.feedbackTicket.count({ where: { isAnonymous: true } });
@@ -57,14 +61,14 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
       where: { email: finalEmail },
       update: { 
         fullName: finalName, 
-        ...(finalCode ? { employeeCode: finalCode } : {}),
+        employeeCode: finalCode,
         department: empDepartment || "General",
         ...(finalJoiningDate ? { joiningDate: finalJoiningDate } : {})
       },
       create: { 
         email: finalEmail, 
         fullName: finalName, 
-        ...(finalCode ? { employeeCode: finalCode } : {}),
+        employeeCode: finalCode,
         department: empDepartment || "General", 
         designation: empDesignation || "Employee",
         ...(finalJoiningDate ? { joiningDate: finalJoiningDate } : {})
