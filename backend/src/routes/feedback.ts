@@ -57,6 +57,15 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
        finalEmail = `manual-${Date.now()}@fms.com`;
     }
 
+    // Prevent Unique Constraint crash if they manually typed an existing employeeCode
+    if (finalCode && !finalCode.startsWith('M-CODE-') && !finalCode.startsWith('ANON-')) {
+       const existingByCode = await prisma.employee.findUnique({ where: { employeeCode: finalCode } });
+       if (existingByCode) {
+          // Force alignment so we update the correct existing employee instead of crashing
+          finalEmail = existingByCode.email;
+       }
+    }
+
     const employee = await prisma.employee.upsert({
       where: { email: finalEmail },
       update: { 
