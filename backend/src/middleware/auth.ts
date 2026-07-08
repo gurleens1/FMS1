@@ -58,7 +58,8 @@ export async function authenticateToken(
     // Proceed to JWT authentication
   } else {
     const apiKey = req.headers['x-api-key'] as string | undefined;
-    if (apiKey && apiKey === process.env.VOICEBOX_API_KEY) {
+    const validApiKey = process.env.VOICEBOX_API_KEY || process.env.EXTERNAL_API_KEY;
+    if (apiKey && validApiKey && apiKey === validApiKey) {
       req.user = { userId: 0, email: 'voicebox@system', name: 'Voicebox System', role: 'Voicebox' };
       next();
       return;
